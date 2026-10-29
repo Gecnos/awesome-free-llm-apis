@@ -16,7 +16,7 @@ Ask the user what matters most, then recommend accordingly:
 | Fastest inference | Groq (LPU hardware; ~1,000 RPD on chat models) |
 | Largest model selection | NVIDIA NIM (100+ models), Cloudflare Workers AI (60+), Hugging Face (thousands, small credit) |
 | Strongest proprietary models | Google Gemini, Mistral AI, Cohere (non-commercial only) |
-| Free frontier open-weight models | OpenRouter (`:free` models), Kilo Code, Ollama Cloud, NVIDIA NIM |
+| Free frontier open-weight models | OpenRouter (`:free` models), Kilo Code, NVIDIA NIM |
 | European provider / EU hosting | Mistral AI (FR), OVHcloud AI Endpoints (FR, EU data centers), LLM7.io (UK) |
 | No signup or key required | OVHcloud AI Endpoints (2 RPM/IP), Kilo Code (200 req/hr/IP), LLM7.io (anonymous tier) |
 | Privacy-sensitive prompts | Avoid Gemini free tier outside the EEA, Switzerland and the UK, Mistral free mode (unless opted out), OpenRouter/Kilo free routes, NVIDIA trial endpoints |
@@ -29,7 +29,7 @@ Ask the user what matters most, then recommend accordingly:
 - See [references/provider-apis.md](references/provider-apis.md) for setup instructions.
 
 **Inference providers** -- third-party platforms hosting open-weight models:
-- Cloudflare Workers AI, Gonka Broker, Groq, Kilo Code (no key needed), LLM7.io (no key needed), ModelScope, NVIDIA NIM, Ollama Cloud, OpenRouter, OVHcloud AI Endpoints (no key needed), SiliconFlow
+- Cloudflare Workers AI, Gonka Broker, Groq, Kilo Code (no key needed), LLM7.io (no key needed), ModelScope, NVIDIA NIM, OpenRouter, OVHcloud AI Endpoints (no key needed), SiliconFlow
 - See [references/inference-providers.md](references/inference-providers.md) for setup instructions.
 <!-- providers:end -->
 
