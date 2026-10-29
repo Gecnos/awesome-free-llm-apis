@@ -82,8 +82,12 @@ The result is `sources-latest.json` on the branch `probe-results` (one copy per 
    run `node scripts/validate-data.js` and
    `node scripts/check-sources.js --out /tmp/sources.json --consistent`. Both must pass.
    Then open /tmp/sources.json: every entry and link that your PR changed must have
-   `state: "OK"`. Entries you did not touch do not block the PR. Commit, push, and open one
-   PR (format below).
+   `state: "OK"`. Entries you did not touch do not block the PR. Commit with the PR title as
+   the commit subject and the PR body as the commit body (format below), then push. Do not
+   open the PR yourself: the workflow "Post as Seb" opens it in Seb's name when the branch
+   lands. Find its number with the GitHub tools (list open PRs for the branch, retry for up
+   to 3 minutes). A PR or a close done through your GitHub tools shows a Claude badge on
+   Seb's avatar.
 8. Post the Slack message (format below).
 
 ## Rules
