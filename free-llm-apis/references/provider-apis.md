@@ -2,7 +2,7 @@
 
 APIs run by the companies that train or fine-tune the models themselves.
 
-<!-- Generated from data.json by scripts/generate-skill.js (data last updated 2026-10-05). Do not edit by hand. -->
+<!-- Generated from data.json by scripts/generate-skill.js (data last updated 2026-10-25). Do not edit by hand. -->
 
 ## Aion Labs 🇮🇱
 
@@ -132,16 +132,13 @@ Free tier, no credit card. Free-tier prompts may be used by Google to improve pr
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
 | `gemini-3.8-flash` | 1M | Text + Image + Audio + Video | — |
-| `gemini-3.7-flash` | 1M | Text + Image + Audio + Video | — |
-| `gemini-3.6-flash` | 1M | Text + Image + Audio + Video | 15 RPM, 1,500 RPD |
-| `gemini-3.5-flash` | 1M | Text + Image + Audio + Video | 15 RPM, 1,500 RPD |
-| `gemini-3.5-flash-lite` | 1M | Text + Image + Audio + Video | 30 RPM, 1,500 RPD |
-| `gemini-3.1-flash-lite` | 1M | Text + Image + Audio + Video | 30 RPM, 1,500 RPD |
-| `gemini-2.5-flash` | 1M | Text + Image + Audio + Video | 15 RPM, 1,500 RPD |
-| `gemini-2.5-flash-lite` | 1M | Text + Image + Audio + Video | 30 RPM, 1,500 RPD |
-| `gemini-2.5-pro` | 1M | Text + Image + Audio + Video | 5 RPM, 50 RPD |
-| `gemma-4-31b-it` | 256K | Text | — |
-| `gemma-4-26b-a4b-it` | 256K | Text | — |
+| `gemini-3.6-flash` | 1M | Text + Image + Audio + Video | — |
+| `gemini-3.5-flash-lite` | 1M | Text + Image + Audio + Video | — |
+| `gemini-3.1-flash-lite` | 1M | Text + Image + Audio + Video | — |
+| `gemini-2.5-flash` | 1M | Text + Image + Audio + Video | — |
+| `gemini-2.5-flash-lite` | 1M | Text + Image + Audio + Video | — |
+| `gemma-4-31b-it` | 256K | Text + Image | — |
+| `gemma-4-26b-a4b-it` | 256K | Text + Image | — |
 
 ### Environment variable
 
@@ -180,9 +177,9 @@ curl -s https://generativelanguage.googleapis.com/v1beta/openai/chat/completions
 
 ## Mistral AI 🇫🇷
 
-Free mode, enabled by default, no credit card required. $10/month in API credits, and free-mode prompts may be used to train Mistral models unless you opt out.
+Free mode, enabled by default, no credit card required. Free-mode prompts may be used to train Mistral models unless you opt out.
 
-**Notes:** Mistral plans are global: the monthly allowance is shared across Studio, the API, and Vibe Code, so CLI usage eats the same budget ([subscriptions](https://docs.mistral.ai/admin/billing-usage/subscriptions)). Free mode is the default for new accounts and needs no credit card ([quickstart](https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key)), and the Free plan card on the [pricing page](https://mistral.ai/pricing) is what carries the $10/month in API credits figure quoted in the description. Free-mode inputs and outputs may be used to train Mistral models, and you can opt out at any time ([data usage](https://help.mistral.ai/en/articles/347617-do-you-use-my-user-data-to-train-your-artificial-intelligence-models)). Mistral no longer publishes numeric free-tier rate limits and points you at the Limits page of the admin panel instead ([rate limits](https://help.mistral.ai/en/articles/698531-why-am-i-hitting-api-rate-limits-and-how-do-i-increase-them)); the rate limit column is kept from the last published values.
+**Notes:** Mistral plans are global: the monthly allowance is shared across Studio, the API, and Vibe Code, so CLI usage eats the same budget ([subscriptions](https://docs.mistral.ai/admin/billing-usage/subscriptions)). Free mode is the default for new accounts and needs no credit card ([quickstart](https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key)), and the Free plan card on the [pricing page](https://mistral.ai/pricing) lists no API credit amount. Free-mode inputs and outputs may be used to train Mistral models, and you can opt out at any time ([data usage](https://help.mistral.ai/en/articles/347617-do-you-use-my-user-data-to-train-your-artificial-intelligence-models)). Mistral no longer publishes numeric free-tier rate limits and points you at the Limits page of the admin panel instead ([rate limits](https://help.mistral.ai/en/articles/698531-why-am-i-hitting-api-rate-limits-and-how-do-i-increase-them)); the rate limit column is kept from the last published values.
 
 **Get a key:** https://console.mistral.ai/api-keys
 

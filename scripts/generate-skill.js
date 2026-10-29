@@ -22,15 +22,19 @@ const SETUP = {
   'z ai (zhipu ai)':       { env: 'ZAI_API_KEY' },
   'cloudflare workers ai': { env: 'CF_API_TOKEN', extraEnv: { CF_ACCOUNT_ID: 'your-account-id' },
                              openaiBaseUrl: 'https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/v1' },
+  'gonka broker':          { env: 'GONKA_API_KEY' },
   'groq':                  { env: 'GROQ_API_KEY' },
   'hugging face':          { env: 'HF_API_KEY' },
-  'kilo code':             { env: 'KILO_API_KEY', keyless: true },
+  // Kilo Code rejects placeholder keys such as "none" and only accepts the literal "anonymous".
+  'kilo code':             { env: 'KILO_API_KEY', keyless: true, anonymousKey: 'anonymous' },
   'llm7.io':               { env: 'LLM7_API_KEY', keyless: true },
   'modelscope':            { env: 'MODELSCOPE_API_KEY' },
   'nvidia nim':            { env: 'NVIDIA_API_KEY' },
   'ollama cloud':          { env: 'OLLAMA_API_KEY', openaiBaseUrl: 'https://ollama.com/v1' },
   'openrouter':            { env: 'OPENROUTER_API_KEY' },
-  'ovhcloud ai endpoints': { env: 'OVH_API_KEY', keyless: true },
+  // OVHcloud rejects every Bearer value on its anonymous tier, and the OpenAI SDK always sends one,
+  // so the keyless example is a plain HTTP call without an Authorization header.
+  'ovhcloud ai endpoints': { env: 'OVH_API_KEY', keyless: true, noBearer: true },
   'siliconflow':           { env: 'SILICONFLOW_API_KEY' },
 };
 
@@ -49,8 +53,11 @@ const CATEGORIES = {
 
 function setupFor(provider) {
   const s = SETUP[provider.name.toLowerCase()];
-  if (!s) throw new Error(`No SETUP entry for provider "${provider.name}" in scripts/generate-skill.js`);
-  return s;
+  if (s) return s;
+  // A provider added to data.json without a SETUP entry still gets a guide, with a key env var named after it.
+  const env = provider.name.toUpperCase().replace(/\(.*?\)/g, '').trim().replace(/[^A-Z0-9]+/g, '_') + '_API_KEY';
+  console.warn(`No SETUP entry for "${provider.name}" in scripts/generate-skill.js, using ${env}.`);
+  return { env };
 }
 
 function exampleModel(provider) {
@@ -71,7 +78,7 @@ function renderProvider(p) {
   const shBaseUrl = baseUrl.replace('{account_id}', '$CF_ACCOUNT_ID').replace(/\/$/, '');
   const model = exampleModel(p);
   const footnote = p.footnoteRef != null ? data.footnotes.find(f => f.id === p.footnoteRef) : null;
-  const apiKeyExpr = s.keyless ? `os.environ.get("${s.env}", "none")` : `os.environ["${s.env}"]`;
+  const apiKeyExpr = s.keyless ? `os.environ.get("${s.env}", "${s.anonymousKey || 'none'}")` : `os.environ["${s.env}"]`;
 
   const lines = [];
   lines.push(`## ${p.name} ${p.flag || ''}`.trimEnd(), '');
@@ -98,6 +105,21 @@ function renderProvider(p) {
   lines.push('```', '');
 
   lines.push('### Usage example', '', '```python');
+  if (s.noBearer) {
+    lines.push('import os');
+    lines.push('import requests', '');
+    lines.push('# Without a key, send no Authorization header: the anonymous tier rejects any Bearer value.');
+    lines.push(`key = os.environ.get("${s.env}")`);
+    lines.push('headers = {"Authorization": f"Bearer {key}"} if key else {}', '');
+    lines.push('response = requests.post(');
+    lines.push(`    "${shBaseUrl}/chat/completions",`);
+    lines.push('    headers=headers,');
+    lines.push(`    json={"model": "${model}", "messages": [{"role": "user", "content": "Say hello in one sentence."}]},`);
+    lines.push(')');
+    lines.push('print(response.json()["choices"][0]["message"]["content"])');
+    lines.push('```', '');
+    lines.push('With a key, the OpenAI SDK works as for any other provider.', '');
+  } else {
   lines.push('import os');
   lines.push('from openai import OpenAI', '');
   lines.push('client = OpenAI(');
@@ -110,10 +132,12 @@ function renderProvider(p) {
   lines.push(')');
   lines.push('print(response.choices[0].message.content)');
   lines.push('```', '');
+  }
 
   lines.push('### Quick test', '', '```bash');
   lines.push(`curl -s ${shBaseUrl}/chat/completions \\`);
   if (!s.keyless) lines.push(`  -H "Authorization: Bearer $${s.env}" \\`);
+  else if (s.anonymousKey) lines.push(`  -H "Authorization: Bearer ${s.anonymousKey}" \\`);
   lines.push('  -H "Content-Type: application/json" \\');
   lines.push(`  -d '{"model": "${model}", "messages": [{"role": "user", "content": "Say hello"}]}'`);
   lines.push('```', '');

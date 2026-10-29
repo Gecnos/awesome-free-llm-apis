@@ -2,7 +2,7 @@
 
 Third-party platforms that host open-weight models from various sources.
 
-<!-- Generated from data.json by scripts/generate-skill.js (data last updated 2026-10-05). Do not edit by hand. -->
+<!-- Generated from data.json by scripts/generate-skill.js (data last updated 2026-10-25). Do not edit by hand. -->
 
 ## Cloudflare Workers AI 🇺🇸
 
@@ -64,6 +64,60 @@ curl -s https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/ai/v1/chat/
 
 ---
 
+## Gonka Broker 🇺🇸
+
+Permanent free tier, no credit card required; phone verification required. ~1M tokens/month (shared, varies by model), resets monthly. Model lineup rotates with network governance — live list at /v1/models.
+
+**Notes:** The free grant is issued only after SMS verification with a real (non-VoIP) phone number, one grant per number ([billing docs](https://docs.gonkabroker.com/guides/billing-and-deposits/)). Unused free tokens do not carry over to the next month. The grant is sized as at least 1M tokens of the most expensive model; cheaper models stretch further (e.g. ~6M tokens for BGE-M3) ([free tier page](https://gonkabroker.com/free-llm-api/)). While running on free-tier funds only, requests are capped at a lower rate; the current cap is returned as `maxRpm` by `/test-auth` ([limits](https://docs.gonkabroker.com/reference/limits-and-quotas/)).
+
+**Get a key:** https://app.gonkabroker.com/signup
+
+**OpenAI-compatible base URL:** `https://proxy.gonkabroker.com/v1`
+
+### Models
+
+| Model ID | Context | Modality | Rate limit |
+| --- | --- | --- | --- |
+| `MiniMaxAI/MiniMax-M2.7` | 200K | Text (reasoning) | ~1M tokens/month (shared, varies by model) |
+| `deepseek-ai/DeepSeek-V4-Flash-0731` | 400K | Text (reasoning) | ~1M tokens/month (shared, varies by model) |
+| `zai-org/GLM-5.3-Flash` | 400K | Text (reasoning) | ~1M tokens/month (shared, varies by model) |
+| `BAAI/bge-m3` | 8K | Embeddings | ~1M tokens/month (shared, varies by model) |
+
+### Environment variable
+
+```bash
+export GONKA_API_KEY="your-key-here"
+```
+
+### Usage example
+
+```python
+import os
+from openai import OpenAI
+
+client = OpenAI(
+    api_key=os.environ["GONKA_API_KEY"],
+    base_url="https://proxy.gonkabroker.com/v1",
+)
+
+response = client.chat.completions.create(
+    model="MiniMaxAI/MiniMax-M2.7",
+    messages=[{"role": "user", "content": "Say hello in one sentence."}],
+)
+print(response.choices[0].message.content)
+```
+
+### Quick test
+
+```bash
+curl -s https://proxy.gonkabroker.com/v1/chat/completions \
+  -H "Authorization: Bearer $GONKA_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "MiniMaxAI/MiniMax-M2.7", "messages": [{"role": "user", "content": "Say hello"}]}'
+```
+
+---
+
 ## Groq 🇺🇸
 
 Free tier, no credit card. Ultra-fast LPU inference.
@@ -80,7 +134,7 @@ Free tier, no credit card. Ultra-fast LPU inference.
 | --- | --- | --- | --- |
 | `openai/gpt-oss-120b` | 131K | Text | 30 RPM, 1,000 RPD |
 | `openai/gpt-oss-20b` | 131K | Text | 30 RPM, 1,000 RPD |
-| `qwen/qwen3.8-27b` | 131K | Text | 30 RPM, 1,000 RPD |
+| `qwen/qwen3.8-27b` | 131K | Text + Image | 30 RPM, 1,000 RPD |
 
 ### Environment variable
 
@@ -117,65 +171,11 @@ curl -s https://api.groq.com/openai/v1/chat/completions \
 
 ---
 
-## Hugging Face 🇺🇸
-
-$0.10/month in Inference Provider credits for free users (subject to change). Routes to Fireworks, Together, Hyperbolic, Nebius, Novita, DeepInfra and others. Thousands of models.
-
-**Get a key:** https://huggingface.co/settings/tokens
-
-**OpenAI-compatible base URL:** `https://router.huggingface.co/v1`
-
-### Models
-
-| Model ID | Context | Modality | Rate limit |
-| --- | --- | --- | --- |
-| `meta-llama/Llama-3.1-8B-Instruct` | 128K | Text | Credit-metered |
-| `google/gemma-3-4b-it` | 131K | Text | Credit-metered |
-| `microsoft/phi-4` | 16K | Text | Credit-metered |
-| `Qwen/Qwen2.5-Coder-7B-Instruct` | 131K | Text | Credit-metered |
-| `Qwen/Qwen2.5-7B-Instruct` | 131K | Text | Credit-metered |
-| + thousands of community models | Varies | Text, Image, Audio, Embeddings | Credit-metered |
-
-### Environment variable
-
-```bash
-export HF_API_KEY="your-key-here"
-```
-
-### Usage example
-
-```python
-import os
-from openai import OpenAI
-
-client = OpenAI(
-    api_key=os.environ["HF_API_KEY"],
-    base_url="https://router.huggingface.co/v1",
-)
-
-response = client.chat.completions.create(
-    model="meta-llama/Llama-3.1-8B-Instruct",
-    messages=[{"role": "user", "content": "Say hello in one sentence."}],
-)
-print(response.choices[0].message.content)
-```
-
-### Quick test
-
-```bash
-curl -s https://router.huggingface.co/v1/chat/completions \
-  -H "Authorization: Bearer $HF_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "meta-llama/Llama-3.1-8B-Instruct", "messages": [{"role": "user", "content": "Say hello"}]}'
-```
-
----
-
 ## Kilo Code 🇺🇸
 
 Free models with no credit card and no API key required. `kilo-auto/free` auto-router dynamically routes to models in the free pool.
 
-**Notes:** Kilo Code's free pool changes frequently, and the /api/gateway/models catalog can lag what is actually served: probe results have confirmed models absent from the catalog still answering. Rows through liquid/lfm-2.5-2.6b:free answered a live request between 2026-08-19 and 2026-08-21; the rows after it were added on 2026-10-05 from the catalog, where they are priced at $0, and have not been probed. Free models are reachable with no API key, at 200 requests per hour per IP ([authentication](https://kilo.ai/docs/gateway/authentication)). The kilo-auto/free router picks a model from the free pool, and Kilo's docs warn it "may route your requests to providers that log prompts and outputs". The NVIDIA free endpoints carry NVIDIA's own condition, quoted on Kilo's [models page](https://kilo.ai/docs/gateway/models-and-providers): "Trial use only - do not submit personal or confidential data. Your use is logged for security purposes and to improve NVIDIA products and services."
+**Notes:** Kilo Code's free pool changes frequently, and the /api/gateway/models catalog can lag what is actually served: probe results have confirmed models absent from the catalog still answering. Rows through liquid/lfm-2.5-2.6b:free answered a live request between 2026-08-19 and 2026-08-21; the rows after it were added on 2026-10-05 (through dots-studio/dots-3-note-preview:free) 2026-10-23 and 2026-10-25 from the catalog, where they are priced at $0, and have not been probed. The catalog describes reflection/beam-free as served through Vercel AI Gateway and notes that prompts may be retained for training. Free models are reachable with no API key, at 200 requests per hour per IP ([authentication](https://kilo.ai/docs/gateway/authentication)). The kilo-auto/free router picks a model from the free pool, and Kilo's docs warn it "may route your requests to providers that log prompts and outputs". The NVIDIA free endpoints carry NVIDIA's own condition, quoted on Kilo's [models page](https://kilo.ai/docs/gateway/models-and-providers): "Trial use only - do not submit personal or confidential data. Your use is logged for security purposes and to improve NVIDIA products and services."
 
 **Get a key:** https://app.kilo.ai/profile (optional: free models work without a key)
 
@@ -186,22 +186,22 @@ Free models with no credit card and no API key required. `kilo-auto/free` auto-r
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
 | `nvidia/nemotron-3-ultra-550b-a55b:free` | 1M | Text | 200 req/hr |
-| `stepfun/step-3.7-flash:free` | 262K | Text + Vision | 200 req/hr |
-| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Text | 200 req/hr |
 | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | 256K | Multimodal | 200 req/hr |
 | `poolside/laguna-s-2.1:free` | 262K | Text (code) | 200 req/hr |
 | `poolside/laguna-xs-2.1:free` | 262K | Text (code) | 200 req/hr |
 | `cohere/north-mini-code:free` | 256K | Text (code) | 200 req/hr |
 | `openrouter/free` | Varies | Text | 200 req/hr |
-| `tencent/hy3:free` | 262K | Text | 200 req/hr |
 | `nvidia/nemotron-3.5-lightning:free` | 1M | Text | 200 req/hr |
 | `liquid/lfm-2.5-2.6b:free` | 64K | Text | 200 req/hr |
 | `kilo-auto/free` | 256K | Text | 200 req/hr |
-| `inclusionai/ling-3.1-flash` | 262K | Text | 200 req/hr |
-| `inclusionai/ling-3.0-flash-sante:free` | 262K | Text | 200 req/hr |
-| `apodex/apodex-1.1-mini:free` | 262K | Text | 200 req/hr |
-| `qwen/qwen3.8-27b:free` | 262K | Multimodal | 200 req/hr |
 | `dots-studio/dots-3-note-preview:free` | 512K | Text + Vision | 200 req/hr |
+| `recursive/flint-v1.0:free` | 262K | Text (code) | 200 req/hr |
+| `xingchen-agi/xing4.0-29b-a4b:free` | 262K | Text | 200 req/hr |
+| `nvidia/nemotron-3.5-super-vl:free` | 1M | Multimodal | 200 req/hr |
+| `reflection/beam-free` | 1M | Text | 200 req/hr |
+| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Text | 200 req/hr |
+| `stealth/glyph-cluster` | 256K | Text (code) | 200 req/hr |
+| `nvidia/nemotron-3.5-content-safety:free` | 128K | Text + Vision (moderation) | 200 req/hr |
 
 ### Environment variable
 
@@ -216,7 +216,7 @@ import os
 from openai import OpenAI
 
 client = OpenAI(
-    api_key=os.environ.get("KILO_API_KEY", "none"),
+    api_key=os.environ.get("KILO_API_KEY", "anonymous"),
     base_url="https://api.kilo.ai/api/gateway",
 )
 
@@ -231,6 +231,7 @@ print(response.choices[0].message.content)
 
 ```bash
 curl -s https://api.kilo.ai/api/gateway/chat/completions \
+  -H "Authorization: Bearer anonymous" \
   -H "Content-Type: application/json" \
   -d '{"model": "nvidia/nemotron-3-ultra-550b-a55b:free", "messages": [{"role": "user", "content": "Say hello"}]}'
 ```
@@ -254,7 +255,8 @@ API gateway with a free tier. Anonymous access needs no key and reaches the `tur
 | `gpt-oss:20b` | 128K | Text | 60 RPM, 250 req/hr (free token) |
 | `mistral-Nemo-Instruct-2407` | 128K | Text | 60 RPM, 250 req/hr (free token) |
 | `minimax-m2.7` | 180K | Text (reasoning) | 60 RPM, 250 req/hr (free token) |
-| `DeepSeek-V4-Flash-0731` | 400K | Text (reasoning) | 60 RPM, 250 req/hr (free token) |
+| `nemotron-3-nano:30b` | 1M | Text (reasoning) | 60 RPM, 250 req/hr (free token) |
+| `codestral-latest` | 32K | Text | 60 RPM, 250 req/hr (free token) |
 
 ### Environment variable
 
@@ -294,7 +296,7 @@ curl -s https://api.llm7.io/v1/chat/completions \
 
 Free API-Inference for registered users. Requires Alibaba Cloud account binding + real-name verification.
 
-**Notes:** API-Inference is free for registered users. Current published limits are 2,000 requests/day per user (total across models), with per-model daily quotas dynamically adjusted and capped at 500; concurrency is also dynamically rate-limited. Requires Alibaba Cloud account binding and real-name verification ([limits](https://modelscope.cn/docs/model-service/API-Inference/limits), [intro](https://modelscope.cn/docs/model-service/API-Inference/intro)).
+**Notes:** API-Inference is free for registered users. Current published limits are 2,000 requests/day per user (total across models), with per-model daily quotas dynamically adjusted and capped at 500; concurrency is also dynamically rate-limited. Requires Alibaba Cloud account binding and real-name verification ([limits](https://modelscope.cn/docs/model-service/API-Inference/limits), [intro](https://modelscope.cn/docs/model-service/API-Inference/intro)). This entry is based on ModelScope's documentation. It cannot be tested from outside mainland China.
 
 **Get a key:** https://modelscope.cn/my/myaccesstoken
 
@@ -355,10 +357,7 @@ Free with NVIDIA Developer Program membership. 100+ models. Rate-limited per mod
 
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
-| `nvidia/nemotron-3-super-120b-a12b` | 1M | Text | 40 RPM, 10,000 RPD |
-| `nvidia/llama-3.1-nemotron-ultra-253b-v1` | 128K | Text | 40 RPM, 10,000 RPD |
-| `google/gemma-4-31b-it` | 262K | Text | 40 RPM, 10,000 RPD |
-| `mistralai/mistral-large-2-instruct` | 128K | Text | 40 RPM, 10,000 RPD |
+| `google/gemma-4-31b-it` | 262K | Text + Image + Video | 40 RPM, 10,000 RPD |
 | `nvidia/nemotron-3-ultra-550b-a55b` | 1M | Text | 40 RPM, 10,000 RPD |
 | `openai/gpt-oss-20b` | 131K | Text | 40 RPM, 10,000 RPD |
 | + 92 more models | Varies | Text, Image, Video, Speech, Embeddings | 40 RPM, 10,000 RPD |
@@ -381,7 +380,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="nvidia/nemotron-3-super-120b-a12b",
+    model="google/gemma-4-31b-it",
     messages=[{"role": "user", "content": "Say hello in one sentence."}],
 )
 print(response.choices[0].message.content)
@@ -393,16 +392,16 @@ print(response.choices[0].message.content)
 curl -s https://integrate.api.nvidia.com/v1/chat/completions \
   -H "Authorization: Bearer $NVIDIA_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "nvidia/nemotron-3-super-120b-a12b", "messages": [{"role": "user", "content": "Say hello"}]}'
+  -d '{"model": "google/gemma-4-31b-it", "messages": [{"role": "user", "content": "Say hello"}]}'
 ```
 
 ---
 
 ## Ollama Cloud 🇺🇸
 
-Free tier with usage limits. 16 cloud model families from the Ollama library. OpenAI SDK-compatible via https://ollama.com/v1.
+Free plan with a starter amount of usage credits for a smaller set of starter models, reset monthly from the sign-up date. 1 concurrent request. OpenAI SDK-compatible via https://ollama.com/v1.
 
-**Notes:** Ollama Cloud measures usage by input, cached input, and output tokens weighted per model ([FAQ](https://docs.ollama.com/cloud)). Free tier has session limits resetting every 5 hours and weekly limits resetting every 7 days. Cloud models are also served through Ollama's OpenAI-compatible endpoint at ollama.com/v1.
+**Notes:** Ollama Cloud's Free plan includes a starter amount of usage for a smaller set of starter models. Buying credits unlocks all models ([pricing](https://ollama.com/pricing)). Free usage resets monthly from the sign-up date. Free allows 1 concurrent request, and extra requests are queued. Models outside the Free plan answer HTTP 402. Cloud models are also served through Ollama's OpenAI-compatible endpoint at ollama.com/v1.
 
 **Get a key:** https://ollama.com/settings/keys
 
@@ -413,16 +412,10 @@ Free tier with usage limits. 16 cloud model families from the Ollama library. Op
 
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
-| `deepseek-v4-pro` | 1M | Text | Session/weekly limits (unpublished) |
-| `deepseek-v4-flash` | 1M | Text | Session/weekly limits (unpublished) |
-| `minimax-m3` | 512K | Text | Session/weekly limits (unpublished) |
-| `kimi-k3` | 1M | Text | Session/weekly limits (unpublished) |
-| `gpt-oss:120b` | 128K | Text | Session/weekly limits (unpublished) |
-| `gpt-oss:20b` | 131K | Text | Session/weekly limits (unpublished) |
-| `nemotron-3-ultra` | 262K | Text | Session/weekly limits (unpublished) |
-| `mistral-large-3:675b` | 256K | Text | Session/weekly limits (unpublished) |
-| `qwen3.5:397b` | 256K | Text | Session/weekly limits (unpublished) |
-| + 7 more cloud models | Varies | Text | Session/weekly limits (unpublished) |
+| `gpt-oss:120b` | 128K | Text | 1 concurrent request, monthly starter credits |
+| `gpt-oss:20b` | 128K | Text | 1 concurrent request, monthly starter credits |
+| `nemotron-3-ultra` | 256K | Text | 1 concurrent request, monthly starter credits |
+| + other starter models | Varies | Text | 1 concurrent request, monthly starter credits |
 
 ### Environment variable
 
@@ -442,7 +435,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="deepseek-v4-pro",
+    model="gpt-oss:120b",
     messages=[{"role": "user", "content": "Say hello in one sentence."}],
 )
 print(response.choices[0].message.content)
@@ -454,7 +447,7 @@ print(response.choices[0].message.content)
 curl -s https://ollama.com/v1/chat/completions \
   -H "Authorization: Bearer $OLLAMA_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "deepseek-v4-pro", "messages": [{"role": "user", "content": "Say hello"}]}'
+  -d '{"model": "gpt-oss:120b", "messages": [{"role": "user", "content": "Say hello"}]}'
 ```
 
 ---
@@ -463,7 +456,7 @@ curl -s https://ollama.com/v1/chat/completions \
 
 17 free models (marked with `:free` suffix). OpenAI SDK-compatible.
 
-**Notes:** Free models default to 50 RPD per model. A one-time purchase of $10+ in credits unlocks 1,000 RPD for free models. OpenRouter also offers a [Free Models Router](https://openrouter.ai/docs/guides/routing/routers/free-models-router) (`openrouter/free`) and [model fallbacks](https://openrouter.ai/docs/guides/routing/model-fallbacks) for chaining models in priority order. Free providers may log prompts for training.
+**Notes:** Free models allow 20 requests per minute and 50 requests per day, counted across all free models. Accounts that bought at least 10 credits get 1,000 requests per day ([limits](https://openrouter.ai/docs/api-reference/limits)). OpenRouter also offers a [Free Models Router](https://openrouter.ai/docs/guides/routing/routers/free-router) (`openrouter/free`) and [model fallbacks](https://openrouter.ai/docs/guides/routing/model-fallbacks) for chaining models in priority order. Free providers may log prompts for training.
 
 **Get a key:** https://openrouter.ai/keys
 
@@ -473,23 +466,23 @@ curl -s https://ollama.com/v1/chat/completions \
 
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
-| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Text | 20 RPM, 50 RPD |
 | `cohere/north-mini-code:free` | 256K | Text (code) | 20 RPM, 50 RPD |
-| `google/gemma-4-26b-a4b-it:free` | 262K | Text + Image | 20 RPM, 50 RPD |
-| `google/gemma-4-31b-it:free` | 262K | Text + Image | 20 RPM, 50 RPD |
-| `nvidia/nemotron-nano-9b-v2:free` | 128K | Text | 20 RPM, 50 RPD |
-| `nvidia/nemotron-nano-12b-v2-vl:free` | 128K | Text + Image | 20 RPM, 50 RPD |
+| `google/gemma-4-26b-a4b-it:free` | 262K | Text + Image + Video | 20 RPM, 50 RPD |
+| `google/gemma-4-31b-it:free` | 262K | Text + Image + Video | 20 RPM, 50 RPD |
 | `poolside/laguna-s-2.1:free` | 262K | Text (code) | 20 RPM, 50 RPD |
 | `poolside/laguna-xs-2.1:free` | 262K | Text (code) | 20 RPM, 50 RPD |
-| `apodex/apodex-1.1-mini:free` | 262K | Text | 20 RPM, 50 RPD |
-| `inclusionai/ling-3.0-flash-sante:free` | 262K | Text | 20 RPM, 50 RPD |
-| `qwen/qwen3.8-27b:free` | 262K | Text + Image + Video | 20 RPM, 50 RPD |
 | `dots-studio/dots-3-note-preview:free` | 512K | Text + Image | 20 RPM, 50 RPD |
 | `liquid/lfm-2.5-2.6b:free` | 64K | Text | 20 RPM, 50 RPD |
 | `nvidia/nemotron-3.5-lightning:free` | 1M | Text | 20 RPM, 50 RPD |
 | `thinkingmachines/inkling:free` | 1M | Text + Image + Audio | 20 RPM, 50 RPD |
 | `nvidia/nemotron-3-ultra-550b-a55b:free` | 1M | Text | 20 RPM, 50 RPD |
-| + 6 more free models | Varies | Text / Image | 20 RPM, 50 RPD |
+| `recursive/flint-v1.0:free` | 262K | Text | 20 RPM, 50 RPD |
+| `xingchen-agi/xing4.0-29b-a4b:free` | 262K | Text | 20 RPM, 50 RPD |
+| `nvidia/nemotron-3.5-super-vl:free` | 1M | Text + Image + Video | 20 RPM, 50 RPD |
+| `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | 256K | Text + Image + Audio + Video | 20 RPM, 50 RPD |
+| `thinkingmachines/inkling-small:free` | 1M | Text + Image + Audio | 20 RPM, 50 RPD |
+| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Text | 20 RPM, 50 RPD |
+| `nvidia/nemotron-3.5-content-safety:free` | 128K | Text + Image (moderation) | 20 RPM, 50 RPD |
 
 ### Environment variable
 
@@ -509,7 +502,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="nvidia/nemotron-3-super-120b-a12b:free",
+    model="cohere/north-mini-code:free",
     messages=[{"role": "user", "content": "Say hello in one sentence."}],
 )
 print(response.choices[0].message.content)
@@ -521,7 +514,7 @@ print(response.choices[0].message.content)
 curl -s https://openrouter.ai/api/v1/chat/completions \
   -H "Authorization: Bearer $OPENROUTER_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "nvidia/nemotron-3-super-120b-a12b:free", "messages": [{"role": "user", "content": "Say hello"}]}'
+  -d '{"model": "cohere/north-mini-code:free", "messages": [{"role": "user", "content": "Say hello"}]}'
 ```
 
 ---
@@ -530,7 +523,7 @@ curl -s https://openrouter.ai/api/v1/chat/completions \
 
 Free anonymous tier (no API key, no signup): 2 RPM per IP per model. 20+ open-weight models hosted in EU. OpenAI SDK-compatible.
 
-**Notes:** OVHcloud AI Endpoints offers a permanent free anonymous tier (2 requests per minute per IP, per model) with no signup or API key required. Higher rate limits (400 RPM per Public Cloud project per model) require an API key and are billed pay-as-you-go per token; new Public Cloud accounts get up to $200 in free trial credits. Models are hosted in EU data centers.
+**Notes:** OVHcloud AI Endpoints offers a permanent free anonymous tier (2 requests per minute per IP, per model) with no signup or API key required. Higher rate limits (400 RPM per Public Cloud project per model) require an API key and are billed pay-as-you-go per token; new Public Cloud accounts get up to $200 in free trial credits. Models are hosted in EU data centers. The catalog lists an end of life on November 4, 2026 for Mistral-Small-3.2-24B-Instruct-2506 and Mistral-Nemo-Instruct-2407.
 
 **Get a key:** https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/ (optional: free models work without a key)
 
@@ -541,16 +534,15 @@ Free anonymous tier (no API key, no signup): 2 RPM per IP per model. 20+ open-we
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
 | `Qwen3.5-397B-A17B` | 262K | Text + Vision | 2 RPM (anonymous) |
-| `gpt-oss-120b` | 128K | Text | 2 RPM (anonymous) |
-| `gpt-oss-20b` | 128K | Text | 2 RPM (anonymous) |
+| `gpt-oss-120b` | 131K | Text | 2 RPM (anonymous) |
+| `gpt-oss-20b` | 131K | Text | 2 RPM (anonymous) |
 | `Meta-Llama-3_3-70B-Instruct` | 131K | Text | 2 RPM (anonymous) |
 | `Qwen3.8-27B` | 262K | Text + Vision | 2 RPM (anonymous) |
 | `Qwen3.6-27B` | 262K | Text + Vision | 2 RPM (anonymous) |
 | `Qwen3.5-9B` | 262K | Text + Vision | 2 RPM (anonymous) |
-| `Qwen3-32B` | 131K | Text | 2 RPM (anonymous) |
 | `Qwen2.5-VL-72B-Instruct` | 32K | Text + Vision | 2 RPM (anonymous) |
-| `Mistral-Small-3.2-24B-Instruct-2506` | 128K | Text | 2 RPM (anonymous) |
-| `Mistral-Nemo-Instruct-2407` | 128K | Text | 2 RPM (anonymous) |
+| `Mistral-Small-3.2-24B-Instruct-2506` | 128K | Text + Vision | 2 RPM (anonymous) |
+| `Mistral-Nemo-Instruct-2407` | 118K | Text | 2 RPM (anonymous) |
 
 ### Environment variable
 
@@ -562,19 +554,21 @@ export OVH_API_KEY="your-key-here"
 
 ```python
 import os
-from openai import OpenAI
+import requests
 
-client = OpenAI(
-    api_key=os.environ.get("OVH_API_KEY", "none"),
-    base_url="https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
-)
+# Without a key, send no Authorization header: the anonymous tier rejects any Bearer value.
+key = os.environ.get("OVH_API_KEY")
+headers = {"Authorization": f"Bearer {key}"} if key else {}
 
-response = client.chat.completions.create(
-    model="Qwen3.5-397B-A17B",
-    messages=[{"role": "user", "content": "Say hello in one sentence."}],
+response = requests.post(
+    "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions",
+    headers=headers,
+    json={"model": "Qwen3.5-397B-A17B", "messages": [{"role": "user", "content": "Say hello in one sentence."}]},
 )
-print(response.choices[0].message.content)
+print(response.json()["choices"][0]["message"]["content"])
 ```
+
+With a key, the OpenAI SDK works as for any other provider.
 
 ### Quick test
 
@@ -590,7 +584,7 @@ curl -s https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions \
 
 Permanently free models, no credit card required. Identity verification required. 100+ models in the catalog, most of them paid.
 
-**Notes:** SiliconFlow requires real-name identity verification to use free models (effective May 15, 2026, per the [release notes](https://api-docs.siliconflow.cn/docs/release-notes/overview)). Verification supports mainland-Chinese documents; international users must contact support.
+**Notes:** SiliconFlow requires real-name identity verification to use free models (effective May 15, 2026, per the [release notes](https://api-docs.siliconflow.cn/docs/release-notes/overview)). Verification supports mainland-Chinese documents; international users must contact support. This entry is based on SiliconFlow's [pricing page](https://siliconflow.cn/pricing), which marks these models free. It cannot be tested from outside mainland China.
 
 **Get a key:** https://cloud.siliconflow.cn/account/ak
 
@@ -600,7 +594,8 @@ Permanently free models, no credit card required. Identity verification required
 
 | Model ID | Context | Modality | Rate limit |
 | --- | --- | --- | --- |
-| `Qwen/Qwen3-8B` | 128K | Text | 1,000 RPM, 50,000 TPM |
+| `tencent/Hunyuan-MT-7B` | — | Text | — |
+| `XingChenAGI/Xing4.0-29B` | — | Text | — |
 
 ### Environment variable
 
@@ -620,7 +615,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="Qwen/Qwen3-8B",
+    model="tencent/Hunyuan-MT-7B",
     messages=[{"role": "user", "content": "Say hello in one sentence."}],
 )
 print(response.choices[0].message.content)
@@ -632,5 +627,5 @@ print(response.choices[0].message.content)
 curl -s https://api.siliconflow.cn/v1/chat/completions \
   -H "Authorization: Bearer $SILICONFLOW_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model": "Qwen/Qwen3-8B", "messages": [{"role": "user", "content": "Say hello"}]}'
+  -d '{"model": "tencent/Hunyuan-MT-7B", "messages": [{"role": "user", "content": "Say hello"}]}'
 ```
