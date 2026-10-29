@@ -754,50 +754,6 @@
       ]
     },
     {
-      "name": "Ollama Cloud",
-      "category": "inference_provider",
-      "country": "US",
-      "flag": "🇺🇸",
-      "url": "https://ollama.com/settings/keys",
-      "baseUrl": "https://ollama.com/api",
-      "description": "Free plan with a starter amount of usage credits for a smaller set of starter models, reset monthly from the sign-up date. 1 concurrent request. OpenAI SDK-compatible via https://ollama.com/v1.",
-      "footnoteRef": 3,
-      "models": [
-        {
-          "id": "gpt-oss:120b",
-          "name": "gpt-oss:120b",
-          "context": "128K",
-          "maxOutput": "Model-dependent",
-          "modality": "Text",
-          "rateLimit": "1 concurrent request, monthly starter credits"
-        },
-        {
-          "id": "gpt-oss:20b",
-          "name": "gpt-oss:20b",
-          "context": "128K",
-          "maxOutput": "Model-dependent",
-          "modality": "Text",
-          "rateLimit": "1 concurrent request, monthly starter credits"
-        },
-        {
-          "id": "nemotron-3-ultra",
-          "name": "nemotron-3-ultra",
-          "context": "256K",
-          "maxOutput": "Model-dependent",
-          "modality": "Text",
-          "rateLimit": "1 concurrent request, monthly starter credits"
-        },
-        {
-          "id": null,
-          "name": "+ other starter models",
-          "context": "Varies",
-          "maxOutput": "Varies",
-          "modality": "Text",
-          "rateLimit": "1 concurrent request, monthly starter credits"
-        }
-      ]
-    },
-    {
       "name": "OpenRouter",
       "category": "inference_provider",
       "country": "US",
@@ -1066,10 +1022,6 @@
     {
       "id": 2,
       "text": "Groq shut down qwen/qwen3.6-27b on September 14, 2026 (replaced by qwen/qwen3.8-27b) and groq/compound and groq/compound-mini on September 21, 2026 ([deprecations](https://console.groq.com/docs/deprecations)). Free-plan limits vary by model; the chat models listed get 1,000 RPD ([rate limits](https://console.groq.com/docs/rate-limits))."
-    },
-    {
-      "id": 3,
-      "text": "Ollama Cloud's Free plan includes a starter amount of usage for a smaller set of starter models. Buying credits unlocks all models ([pricing](https://ollama.com/pricing)). Free usage resets monthly from the sign-up date. Free allows 1 concurrent request, and extra requests are queued. Models outside the Free plan answer HTTP 402. Cloud models are also served through Ollama's OpenAI-compatible endpoint at ollama.com/v1."
     },
     {
       "id": 4,

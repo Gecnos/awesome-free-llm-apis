@@ -196,11 +196,6 @@
     {"provider":"NVIDIA NIM","model":"google/gemma-4-31b-it","fact":"context","value":"262K","url":"https://build.nvidia.com/google/gemma-4-31b-it.md","quote":"context length: 262,144 tokens"},
     {"provider":"NVIDIA NIM","model":"nvidia/nemotron-3-ultra-550b-a55b","fact":"context","value":"1M","url":"https://build.nvidia.com/nvidia/nemotron-3-ultra-550b-a55b.md","quote":"context length: 1,048,576 tokens"},
     {"provider":"NVIDIA NIM","model":"openai/gpt-oss-20b","fact":"context","value":"131K","url":"https://build.nvidia.com/openai/gpt-oss-20b.md","quote":"context length: 131,072 tokens"},
-    {"provider":"Ollama Cloud","fact":"freeTier","value":"Free plan with a starter amount of usage credits for a smaller set of starter models, reset monthly from the sign-up date. 1 concurrent request. OpenAI SDK-compatible via https://ollama.com/v1.","url":"https://ollama.com/pricing","quote":"Free accounts include a starter amount of usage for a smaller set of starter models."},
-    {"provider":"Ollama Cloud","model":"gpt-oss:120b","fact":"rateLimit","value":"1 concurrent request, monthly starter credits","url":"https://ollama.com/pricing","quote":"Free includes 1 concurrent request"},
-    {"provider":"Ollama Cloud","model":"gpt-oss:20b","fact":"rateLimit","value":"1 concurrent request, monthly starter credits","url":"https://ollama.com/pricing","quote":"Free includes 1 concurrent request"},
-    {"provider":"Ollama Cloud","model":"nemotron-3-ultra","fact":"rateLimit","value":"1 concurrent request, monthly starter credits","url":"https://ollama.com/pricing","quote":"Free includes 1 concurrent request"},
-    {"provider":"Ollama Cloud","model":"gpt-oss:120b","fact":"context","value":"128K","url":"https://ollama.com/library/gpt-oss","quote":"gpt-oss:120b-cloud - 128K Text"},
     {"provider":"OpenRouter","fact":"freeTier","value":"17 free models (marked with `:free` suffix). OpenAI SDK-compatible.","url":"https://openrouter.ai/docs/api-reference/limits.md","quote":"If you're using a free model variant (with an ID ending in `:free`), the following limits apply"},
     {"provider":"OpenRouter","model":"cohere/north-mini-code:free","fact":"rateLimit","value":"20 RPM, 50 RPD","url":"https://openrouter.ai/docs/api-reference/limits.md","quote":"Less than 10 | 20 | 50"},
     {"provider":"OpenRouter","model":"google/gemma-4-26b-a4b-it:free","fact":"rateLimit","value":"20 RPM, 50 RPD","url":"https://openrouter.ai/docs/api-reference/limits.md","quote":"Less than 10 | 20 | 50"},
@@ -243,8 +238,6 @@
     {"provider":"OVHcloud AI Endpoints","model":"gpt-oss-120b","fact":"context","value":"131K","url":"https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/","quote":"Parameters : 117B Quantization : fp4 Max. context : 131K"},
     {"provider":"OVHcloud AI Endpoints","model":"gpt-oss-20b","fact":"context","value":"131K","url":"https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/","quote":"Parameters : 21B Quantization : fp4 Max. context : 131K"},
     {"provider":"OVHcloud AI Endpoints","model":"Mistral-Nemo-Instruct-2407","fact":"context","value":"118K","url":"https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/","quote":"Max. context : 118K End of life on Nov 4, 2026"},
-    {"provider":"Ollama Cloud","model":"gpt-oss:20b","fact":"context","value":"128K","url":"https://ollama.com/library/gpt-oss","quote":"gpt-oss:20b-cloud - 128K Text"},
-    {"provider":"Ollama Cloud","model":"nemotron-3-ultra","fact":"context","value":"256K","url":"https://ollama.com/library/nemotron-3-ultra","quote":"nemotron-3-ultra:cloud - 256K Text"},
     {"provider":"Google Gemini","model":"gemma-4-31b-it","fact":"modality","value":"Text + Image","url":"https://ai.google.dev/gemma/docs/core/model_card_4","quote":"Supported Modalities Text, Image"},
     {"provider":"Google Gemini","model":"gemma-4-26b-a4b-it","fact":"modality","value":"Text + Image","url":"https://ai.google.dev/gemma/docs/core/model_card_4","quote":"Supported Modalities Text, Image"},
     {"provider":"Gonka Broker","model":"MiniMaxAI/MiniMax-M2.7","fact":"context","value":"200K","url":"https://gonkabroker.com/models/minimax-m2-on-gonka/","quote":"Context window 200K tokens"},
@@ -254,7 +247,6 @@
     {"provider":"Kilo Code","model":"nvidia/nemotron-3.5-content-safety:free","fact":"rateLimit","value":"200 req/hr","url":"https://kilo.ai/docs/gateway/authentication","quote":"200 requests per hour per IP"}
   ],
   "catalogs": [
-    {"provider":"OpenRouter","type":"openrouter","url":"https://openrouter.ai/api/v1/models"},
-    {"provider":"Ollama Cloud","type":"ollama","url":"https://ollama.com/api/tags"}
+    {"provider":"OpenRouter","type":"openrouter","url":"https://openrouter.ai/api/v1/models"}
   ]
 }

@@ -175,7 +175,7 @@ curl -s https://api.groq.com/openai/v1/chat/completions \
 
 Free models with no credit card and no API key required. `kilo-auto/free` auto-router dynamically routes to models in the free pool.
 
-**Notes:** Kilo Code's free pool changes frequently, and the /api/gateway/models catalog can lag what is actually served: probe results have confirmed models absent from the catalog still answering. Rows through liquid/lfm-2.5-2.6b:free answered a live request between 2026-08-19 and 2026-08-21; the rows after it were added on 2026-10-05 (through dots-studio/dots-3-note-preview:free) 2026-10-23 and 2026-10-25 from the catalog, where they are priced at $0, and have not been probed. The catalog describes reflection/beam-free as served through Vercel AI Gateway and notes that prompts may be retained for training. Free models are reachable with no API key, at 200 requests per hour per IP ([authentication](https://kilo.ai/docs/gateway/authentication)). The kilo-auto/free router picks a model from the free pool, and Kilo's docs warn it "may route your requests to providers that log prompts and outputs". The NVIDIA free endpoints carry NVIDIA's own condition, quoted on Kilo's [models page](https://kilo.ai/docs/gateway/models-and-providers): "Trial use only - do not submit personal or confidential data. Your use is logged for security purposes and to improve NVIDIA products and services."
+**Notes:** Kilo Code's free pool changes frequently, and the /api/gateway/models catalog can lag what is actually served: probe results have confirmed models absent from the catalog still answering. Rows through liquid/lfm-2.5-2.6b:free answered a live request between 2026-08-19 and 2026-08-21; the rows after it were added on 2026-10-05 (through dots-studio/dots-3-note-preview:free), 2026-10-23 and 2026-10-25 from the catalog, where they are priced at $0, and have not been probed. The catalog describes reflection/beam-free as served through Vercel AI Gateway and notes that prompts may be retained for training. Free models are reachable with no API key, at 200 requests per hour per IP ([authentication](https://kilo.ai/docs/gateway/authentication)). The kilo-auto/free router picks a model from the free pool, and Kilo's docs warn it "may route your requests to providers that log prompts and outputs". The NVIDIA free endpoints carry NVIDIA's own condition, quoted on Kilo's [models page](https://kilo.ai/docs/gateway/models-and-providers): "Trial use only - do not submit personal or confidential data. Your use is logged for security purposes and to improve NVIDIA products and services."
 
 **Get a key:** https://app.kilo.ai/profile (optional: free models work without a key)
 
@@ -199,7 +199,6 @@ Free models with no credit card and no API key required. `kilo-auto/free` auto-r
 | `xingchen-agi/xing4.0-29b-a4b:free` | 262K | Text | 200 req/hr |
 | `nvidia/nemotron-3.5-super-vl:free` | 1M | Multimodal | 200 req/hr |
 | `reflection/beam-free` | 1M | Text | 200 req/hr |
-| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Text | 200 req/hr |
 | `stealth/glyph-cluster` | 256K | Text (code) | 200 req/hr |
 | `nvidia/nemotron-3.5-content-safety:free` | 128K | Text + Vision (moderation) | 200 req/hr |
 
@@ -397,61 +396,6 @@ curl -s https://integrate.api.nvidia.com/v1/chat/completions \
 
 ---
 
-## Ollama Cloud 🇺🇸
-
-Free plan with a starter amount of usage credits for a smaller set of starter models, reset monthly from the sign-up date. 1 concurrent request. OpenAI SDK-compatible via https://ollama.com/v1.
-
-**Notes:** Ollama Cloud's Free plan includes a starter amount of usage for a smaller set of starter models. Buying credits unlocks all models ([pricing](https://ollama.com/pricing)). Free usage resets monthly from the sign-up date. Free allows 1 concurrent request, and extra requests are queued. Models outside the Free plan answer HTTP 402. Cloud models are also served through Ollama's OpenAI-compatible endpoint at ollama.com/v1.
-
-**Get a key:** https://ollama.com/settings/keys
-
-**OpenAI-compatible base URL:** `https://ollama.com/v1`
-(native API: `https://ollama.com/api`)
-
-### Models
-
-| Model ID | Context | Modality | Rate limit |
-| --- | --- | --- | --- |
-| `gpt-oss:120b` | 128K | Text | 1 concurrent request, monthly starter credits |
-| `gpt-oss:20b` | 128K | Text | 1 concurrent request, monthly starter credits |
-| `nemotron-3-ultra` | 256K | Text | 1 concurrent request, monthly starter credits |
-| + other starter models | Varies | Text | 1 concurrent request, monthly starter credits |
-
-### Environment variable
-
-```bash
-export OLLAMA_API_KEY="your-key-here"
-```
-
-### Usage example
-
-```python
-import os
-from openai import OpenAI
-
-client = OpenAI(
-    api_key=os.environ["OLLAMA_API_KEY"],
-    base_url="https://ollama.com/v1",
-)
-
-response = client.chat.completions.create(
-    model="gpt-oss:120b",
-    messages=[{"role": "user", "content": "Say hello in one sentence."}],
-)
-print(response.choices[0].message.content)
-```
-
-### Quick test
-
-```bash
-curl -s https://ollama.com/v1/chat/completions \
-  -H "Authorization: Bearer $OLLAMA_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "gpt-oss:120b", "messages": [{"role": "user", "content": "Say hello"}]}'
-```
-
----
-
 ## OpenRouter 🇺🇸
 
 17 free models (marked with `:free` suffix). OpenAI SDK-compatible.
@@ -481,7 +425,6 @@ curl -s https://ollama.com/v1/chat/completions \
 | `nvidia/nemotron-3.5-super-vl:free` | 1M | Text + Image + Video | 20 RPM, 50 RPD |
 | `nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free` | 256K | Text + Image + Audio + Video | 20 RPM, 50 RPD |
 | `thinkingmachines/inkling-small:free` | 1M | Text + Image + Audio | 20 RPM, 50 RPD |
-| `nvidia/nemotron-3-super-120b-a12b:free` | 262K | Text | 20 RPM, 50 RPD |
 | `nvidia/nemotron-3.5-content-safety:free` | 128K | Text + Image (moderation) | 20 RPM, 50 RPD |
 
 ### Environment variable
