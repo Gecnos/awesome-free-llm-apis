@@ -7,10 +7,16 @@ name: Post as Seb
 #     A comment that ends with <!-- close --> also closes its issue or pull request.
 #   - A push to a data/** branch opens its pull request as Seb. The commit subject is the
 #     title and the commit body is the description.
+#   - Any comment, issue or pull request description by Seb that carries an attribution
+#     footer is edited to remove it.
 
 on:
   issue_comment:
-    types: [created]
+    types: [created, edited]
+  issues:
+    types: [opened, edited]
+  pull_request_target:
+    types: [opened, edited]
   push:
     branches: ['data/**']
 
@@ -23,7 +29,7 @@ concurrency:
 
 jobs:
   repost-comment:
-    if: github.event_name == 'issue_comment' && github.event.comment.performed_via_github_app.slug == 'claude'
+    if: github.event_name == 'issue_comment' && github.event.action == 'created' && github.event.comment.performed_via_github_app.slug == 'claude'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.SEB_GITHUB_TOKEN }}
@@ -71,5 +77,35 @@ jobs:
           open="$(gh api "repos/$REPO/pulls?state=open&head=${REPO%%/*}:$BRANCH" --jq 'length')"
           if [ "$open" != "0" ]; then echo "A pull request is already open for $BRANCH."; exit 0; fi
           title="$(printf '%s\n' "$MESSAGE" | head -n 1)"
-          body="$(printf '%s\n' "$MESSAGE" | tail -n +2 | sed -e '/./,$!d')"
+          body="$(printf '%s\n' "$MESSAGE" | tail -n +2 | sed -e '/./,$!d' | grep -viE 'Generated (by|with) \[?Claude|claude\.ai/code|Co-Authored-By: *Claude' || true)"
           gh api "repos/$REPO/pulls" -f title="$title" -f head="$BRANCH" -f base=main -f body="$body" --jq '.html_url'
+
+  strip-footer:
+    if: >-
+      (github.event_name == 'issue_comment' && github.event.comment.user.login == 'SebConejo' && github.event.comment.performed_via_github_app.slug != 'claude') ||
+      (github.event_name == 'issues' && github.event.issue.user.login == 'SebConejo') ||
+      (github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'SebConejo')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.SEB_GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      EVENT: ${{ github.event_name }}
+      COMMENT_ID: ${{ github.event.comment.id }}
+      NUMBER: ${{ github.event.issue.number || github.event.pull_request.number }}
+      BODY: ${{ github.event.comment.body || github.event.issue.body || github.event.pull_request.body }}
+    steps:
+      - name: Remove any attribution footer
+        run: |
+          set -euo pipefail
+          pattern='Generated (by|with) \[?Claude|claude\.ai/code|Co-Authored-By: *Claude'
+          printf '%s' "$BODY" | grep -qiE "$pattern" || exit 0
+          clean="$(printf '%s' "$BODY" \
+            | grep -viE "$pattern" \
+            | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}' \
+            | sed -e '${/^---$/d;}' \
+            | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')"
+          if [ "$EVENT" = issue_comment ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$COMMENT_ID" -f body="$clean" --silent
+          else
+            gh api -X PATCH "repos/$REPO/issues/$NUMBER" -f body="$clean" --silent
+          fi
